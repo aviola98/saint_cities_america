@@ -106,20 +106,22 @@ america_st_cities <- america_st_cities %>%
                             country == "Argentina" ~ "Spanish",
                           TRUE~origin))
 
-america_st_cities %>%
-  ggplot() +
-  geom_sf(aes(color=origin),
-          size=0.5)
+#america_st_cities %>%
+  #ggplot() +
+#  geom_sf(aes(color=origin),
+   #       size=0.5)
 
-world <- st_read("4a7d27e1-84a3-4d6a-b4c2-6b6919f3cf4b202034-1-2zg7ul.ht5ut.shp")
+america_st_cities_crs <- america_st_cities %>% st_set_crs(4326)
 
-
-world %>%
-  st_transform(4326) %>%
-  filter(CONTINENT %in% c("North America","South America")) %>%
-  ggplot() +
-  geom_sf(colour="#756bb1") +
-  geom_sf(data = america_st_cities %>%
-            st_transform(4326),
-          color="origin",
-          size=2)
+st_cities_americas <-
+ggplot(data = world) +
+    geom_sf()+
+  geom_sf(data = america_st_cities_crs,
+            aes(color=origin),
+          size=0.5) +
+  coord_sf(xlim=c(-168.750000,-27.070313),
+           ylim=c(-57.326521,72.711903),
+           expand = F)+
+    ggtitle("Cities in the American Continent named after Saints") +
+    theme_minimal()
+st_cities_americas
