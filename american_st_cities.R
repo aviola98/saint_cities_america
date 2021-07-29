@@ -1,6 +1,12 @@
 library(tidyverse)
 library(readxl)
 library(sf)
+library("rnaturalearth")
+library("rnaturalearthdata")
+
+
+world <- ne_countries(scale = "medium", returnclass = "sf")
+class(world)
 
 world_cities <- read_csv("worldcities.csv",
                          col_types="ccddcccccdd")
@@ -124,4 +130,5 @@ ggplot(data = world) +
            expand = F)+
     ggtitle("Cities in the American Continent named after Saints") +
     theme_minimal()
+
 st_cities_americas
