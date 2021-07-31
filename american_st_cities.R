@@ -57,8 +57,8 @@ census_data <- get_census(dataset='CA16', regions=list(CMA=c("59933","35535")),
 #opening US data
 library(tigris)
 
-urb <- urban_areas(2020)
-
+urb <- counties(2020)
+View(urb)
 urb<-
 urb %>%   filter(str_detect(NAME10, "San |St. |Saint|São|Santo|Santa")) %>%
   rename("city" = "NAME10") %>%
@@ -93,9 +93,39 @@ ciud %>%
                           city =="SAN GREGORIO DE POLANCO"~"San Gregorio de Polanco",
                           city =="SANTA CLARA"~"Santa Clara",
                           city =="SAN CARLOS"~"San Carlos"))
-
+View(ciud)
 uruguay_crs <-
   ciud %>% st_transform(4326) %>%
+  st_as_sf(coords=c("lon","lat"))
+
+#Ecuador cities
+
+ciudades_e <- c("San Gabriel","San Lorenzo de Esmeraldas",
+                "San Miguel","San Miguel de Salcedo",
+                "San Vicente","Santa Ana","Santa Clara",
+                "Santa Elena","Santa Lucía","Santa Rosa",
+                "Santo Domingo de los Colorados","San Jacinto de Buena Fe")
+
+pais <- c("Ecuador","Ecuador","Ecuador",
+          "Ecuador","Ecuador","Ecuador",
+          "Ecuador","Ecuador","Ecuador",
+          "Ecuador","Ecuador","Ecuador")
+
+Lat <- c(0.59318,1.28626,-1.70884,-1.04547,
+         -0.58986,-1.20726,	-1.26399,-2.22622,
+         -2.18333,-3.44882,	-0.25305,-0.8932)
+
+Lon <- c(-77.83078,-78.83514,-79.04311,
+         -78.59063,-80.40806,-80.37132,
+         -77.88739,-80.85873,-80,-79.95952,
+         -79.17536,-79.4907)
+
+ecuador_cities <- tibble(city=ciudades_e,
+                         country=pais,
+                         lat=Lat,
+                         Lon=Lon)
+ecuador_cities_crs <- ecuador_cities %>%
+  st_transform(4326) %>%
   st_as_sf(coords=c("lon","lat"))
 
 #creating a columns for continent in world cities
@@ -196,11 +226,15 @@ america_st_cities <- america_st_cities %>%
                           city == "Santa Rosa" &
                             country == "Argentina" ~ "Spanish",
                           TRUE~origin))
-
-#america_st_cities %>%
-  #ggplot() +
-#  geom_sf(aes(color=origin),
-   #       size=0.5)
+america_st_cities <- 
+america_st_cities %>%
+  mutate(origin=case_when(city %in% c("St. Louis
+", "St. Martinville") & country == "United States" ~ "French",
+                          city %in% c("St. Augustine",
+                                      "Port St. Lucie",
+                                      "St. Helena") &
+                            country == "United States" ~ "Spanish",
+                          TRUE~origin))
 
 america_st_cities_crs <- america_st_cities %>% st_set_crs(4326)
 
